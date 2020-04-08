@@ -1,5 +1,5 @@
 # Disclaimer
-This repository is based on *spECK: Accelerating GPU Sparse Matrix-Matrix Multiplication Through Lightweight Analysis* (link TBA). Please cite this work if you use it for research.
+This repository is based on *spECK: Accelerating GPU Sparse Matrix-Matrix Multiplication Through Lightweight Analysis* ([ACM Link](https://dl.acm.org/doi/10.1145/3332466.3374521)). Please cite this work if you use it for research.
 
 # Getting Started
 1. Install CUDA 10.1 or 10.2 from [https://developer.nvidia.com/cuda-downloads](https://developer.nvidia.com/cuda-downloads)
@@ -40,4 +40,20 @@ Config.ini contains helpful options for:
 
 
 # Bibtex
-TBA
+```
+@inproceedings{10.1145/3332466.3374521,
+author = {Parger, Mathias and Winter, Martin and Mlakar, Daniel and Steinberger, Markus},
+title = {SpECK: Accelerating GPU Sparse Matrix-Matrix Multiplication through Lightweight Analysis},
+year = {2020},
+isbn = {9781450368186},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3332466.3374521},
+doi = {10.1145/3332466.3374521},
+booktitle = {Proceedings of the 25th ACM SIGPLAN Symposium on Principles and Practice of Parallel Programming},
+pages = {362–375},
+numpages = {14},
+location = {San Diego, California},
+series = {PPoPP ’20}
+}
+``` 
