@@ -2,8 +2,8 @@
 This repository is based on *spECK: Accelerating GPU Sparse Matrix-Matrix Multiplication Through Lightweight Analysis* ([ACM Link](https://dl.acm.org/doi/10.1145/3332466.3374521)). Please cite this work if you use it for research.
 
 # Getting Started
-1. Install CUDA 10.1 or 10.2 from [https://developer.nvidia.com/cuda-downloads](https://developer.nvidia.com/cuda-downloads)
-2. Download cub 1.8.0 from [https://nvlabs.github.io/cub/](https://nvlabs.github.io/cub/) and extract content into include/external
+1. Install CUDA 10.1, 10.2 or 11.0 from [https://developer.nvidia.com/cuda-downloads](https://developer.nvidia.com/cuda-downloads)
+2. If you use CUDA 11.0 or newer, please switch to _cuda11_ branch
 3. Install g++ > 7.0 and gcc on Linux or Visual Studio with "Desktop development with C++" workload
 4. Install CMake 3.15.5 or newer from [https://cmake.org/](https://cmake.org/)
 5. Set spECK_STATIC_MEM_PER_BLOCK and spECK_DYNAMIC_MEM_PER_BLOCK in include/Multiply.h line 9 & 10 to the values your hardware supports
@@ -20,7 +20,6 @@ This repository is based on *spECK: Accelerating GPU Sparse Matrix-Matrix Multip
     - Linux
         o Set the correct ComputeCapability (Default is CC70) in "linuxsetup.sh" and run "./linuxsetup.sh"
         o run spECK using "./build/runspECK <path-to-csr-matrix> config.ini"
-
 
 # Notes
 
