@@ -1,37 +1,24 @@
 #include "cusparse/include/cuSparseMultiply.h"
 #include <cuda_runtime.h>
+#include "common.h"
 
 
 namespace cuSPARSE {
-		template<>
-		cusparseStatus_t CUSPARSEAPI CuSparseTest<double>::cusparseMultiply(cusparseHandle_t handle, cusparseOperation_t transA, cusparseOperation_t transB,
-			int m, int n, int k, const cusparseMatDescr_t descrA, int nnzA, const double *csrSortedValA, const int *csrSortedRowPtrA, const int *csrSortedColIndA,
-			const cusparseMatDescr_t descrB, int nnzB, const double *csrSortedValB, const int *csrSortedRowPtrB, const int *csrSortedColIndB,
-			const cusparseMatDescr_t descrC, double *csrSortedValC, const int *csrSortedRowPtrC, int *csrSortedColIndC){
-			return cusparseDcsrgemm(handle, transA, transB, m, n, k,
-				descrA, nnzA, csrSortedValA, csrSortedRowPtrA, csrSortedColIndA,
-				descrB, nnzB, csrSortedValB, csrSortedRowPtrB, csrSortedColIndB,
-				descrC, csrSortedValC, csrSortedRowPtrC, csrSortedColIndC);
-		}
-
-		template<>
-		cusparseStatus_t CUSPARSEAPI CuSparseTest<float>::cusparseMultiply(cusparseHandle_t handle, cusparseOperation_t transA,	cusparseOperation_t transB,	
-			int m, int n, int k, const cusparseMatDescr_t descrA, int nnzA, const float *csrSortedValA, const int *csrSortedRowPtrA, const int *csrSortedColIndA,
-			const cusparseMatDescr_t descrB, int nnzB, const float *csrSortedValB, const int *csrSortedRowPtrB,	const int *csrSortedColIndB,
-			const cusparseMatDescr_t descrC, float *csrSortedValC, const int *csrSortedRowPtrC,	int *csrSortedColIndC){
-			return cusparseScsrgemm(handle, transA, transB, m, n, k,
-				descrA, nnzA, csrSortedValA, csrSortedRowPtrA, csrSortedColIndA,
-				descrB, nnzB, csrSortedValB, csrSortedRowPtrB, csrSortedColIndB,
-				descrC, csrSortedValC, csrSortedRowPtrC, csrSortedColIndC);
-		}
-
 		template<>
 		cusparseStatus_t CUSPARSEAPI CuSparseTest<float>::cusparseTranspose(cusparseHandle_t handle, int m, int n, int nnz,
 			const float  *csrSortedVal,	const int *csrSortedRowPtr, const int *csrSortedColInd,
 			float *cscSortedVal, int *cscSortedRowInd, int *cscSortedColPtr, cusparseAction_t copyValues, cusparseIndexBase_t idxBase)
 		{
-			return cusparseScsr2csc(handle, m, n, nnz, csrSortedVal, csrSortedRowPtr, csrSortedColInd, cscSortedVal,
-				cscSortedRowInd, cscSortedColPtr, copyValues, idxBase);
+            void *buffer = nullptr;
+            size_t buffer_size = 0;
+            checkCuSparseError(cusparseCsr2cscEx2_bufferSize(handle, m, n, nnz, csrSortedVal, csrSortedRowPtr, csrSortedColInd, cscSortedVal,
+				cscSortedColPtr, cscSortedRowInd, CUDA_R_32F, copyValues, idxBase, CUSPARSE_CSR2CSC_ALG1, &buffer_size), "buffer size failed");
+            HANDLE_ERROR(cudaMalloc(&buffer, buffer_size));
+
+            auto retVal = checkCuSparseError(cusparseCsr2cscEx2(handle, m, n, nnz, csrSortedVal, csrSortedRowPtr, csrSortedColInd, cscSortedVal,
+				cscSortedColPtr, cscSortedRowInd, CUDA_R_32F, copyValues, idxBase, CUSPARSE_CSR2CSC_ALG1, buffer), "transpose failed");
+            HANDLE_ERROR(cudaFree(buffer));
+            return retVal;
 		}
 
 		template<>
@@ -39,8 +26,17 @@ namespace cuSPARSE {
 			const double  *csrSortedVal, const int *csrSortedRowPtr, const int *csrSortedColInd,
 			double *cscSortedVal, int *cscSortedRowInd, int *cscSortedColPtr, cusparseAction_t copyValues, cusparseIndexBase_t idxBase)
 		{
-			return cusparseDcsr2csc(handle, m, n, nnz, csrSortedVal, csrSortedRowPtr, csrSortedColInd, cscSortedVal,
-				cscSortedRowInd, cscSortedColPtr, copyValues, idxBase);
+            void *buffer = nullptr;
+            size_t buffer_size = 0;
+            checkCuSparseError(cusparseCsr2cscEx2_bufferSize(handle, m, n, nnz, csrSortedVal, csrSortedRowPtr, csrSortedColInd, cscSortedVal,
+				cscSortedColPtr, cscSortedRowInd, CUDA_R_64F, copyValues, idxBase, CUSPARSE_CSR2CSC_ALG1, &buffer_size), "buffer size failed");
+            HANDLE_ERROR(cudaDeviceSynchronize());
+            HANDLE_ERROR(cudaMalloc(&buffer, buffer_size));
+
+            auto retVal = checkCuSparseError(cusparseCsr2cscEx2(handle, m, n, nnz, csrSortedVal, csrSortedRowPtr, csrSortedColInd, cscSortedVal,
+				cscSortedColPtr, cscSortedRowInd, CUDA_R_64F, copyValues, idxBase, CUSPARSE_CSR2CSC_ALG1, buffer), "transpose failed");
+            HANDLE_ERROR(cudaFree(buffer));
+            return retVal;
 		}
 
 	template <typename DataType>
@@ -49,76 +45,120 @@ namespace cuSPARSE {
 		int nnzC;
 		int *nnzTotalDevHostPtr = &nnzC;
 		float duration;
-		int m, n, k;
-		m = A.rows;
-		n = B.cols;
-		k = A.cols;
-		// matOut.reset();
+        DataType alpha = (DataType) 1.0f;
+        DataType beta = (DataType) 0.0f;
 
 		cudaEvent_t start, stop;
-		cudaEventCreate(&start);
-		cudaEventCreate(&stop);
+		HANDLE_ERROR(cudaEventCreate(&start));
+		HANDLE_ERROR(cudaEventCreate(&stop));
 
 		// ############################
-		cudaEventRecord(start);
+		HANDLE_ERROR(cudaEventRecord(start));
 		// ############################
 
-		// Allocate memory for row indices
-		if(matOut.rows != A.rows)
-		{
-			if (matOut.row_offsets != nullptr)
-				cudaFree(matOut.row_offsets);
+        auto computeType = sizeof(DataType) == 4 ? CUDA_R_32F : CUDA_R_64F;
+        cusparseSpMatDescr_t matA, matB, matC;
+        checkCuSparseError( cusparseCreateCsr(&matA, A.rows, A.cols, A.nnz,
+                                        A.row_offsets, A.col_ids, A.data,
+                                        CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,
+                                        CUSPARSE_INDEX_BASE_ZERO, computeType), "A failed");
+        checkCuSparseError( cusparseCreateCsr(&matB, B.rows, B.cols, B.nnz,
+                                        B.row_offsets, B.col_ids, B.data,
+                                        CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,
+                                        CUSPARSE_INDEX_BASE_ZERO, computeType), "B failed");
+        checkCuSparseError( cusparseCreateCsr(&matC, A.rows, B.cols, 0,
+                                        NULL, NULL, NULL,
+                                        CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,
+                                        CUSPARSE_INDEX_BASE_ZERO, computeType), "C failed");
 
-			cudaMalloc(&(matOut.row_offsets), sizeof(uint32_t) * (A.rows + 1));
-		}
+        void*  dBuffer1    = NULL, *dBuffer2   = NULL;
+        size_t bufferSize1 = 0,    bufferSize2 = 0;
+        cusparseSpGEMMDescr_t spgemmDesc;
+        checkCuSparseError( cusparseSpGEMM_createDescr(&spgemmDesc), "create description failed");
+        auto opA = CUSPARSE_OPERATION_NON_TRANSPOSE;
+        auto opB = CUSPARSE_OPERATION_NON_TRANSPOSE;
+        // Device memory management: Allocate and copy A, B
+        int   *dC_csrOffsets = nullptr, *dC_columns = nullptr;
+        DataType *dC_values;
 
-		// Precompute number of nnz in C
-		checkCuSparseError(cusparseXcsrgemmNnz(
-			handle,
-			CUSPARSE_OPERATION_NON_TRANSPOSE,
-			CUSPARSE_OPERATION_NON_TRANSPOSE,
-			m, n, k,
-			descr, A.nnz, reinterpret_cast<const int*>(A.row_offsets), reinterpret_cast<const int*>(A.col_ids),
-			descrB, B.nnz, reinterpret_cast<const int*>(B.row_offsets), reinterpret_cast<const int*>(B.col_ids),
-			descrC, reinterpret_cast<int*>(matOut.row_offsets), nnzTotalDevHostPtr), "cuSparse: Precompute failed"
-		);
+        // ask bufferSize1 bytes for external memory
+        checkCuSparseError(cusparseSpGEMM_workEstimation(handle, opA, opB,
+                                    &alpha, matA, matB, &beta, matC,
+                                    computeType, CUSPARSE_SPGEMM_DEFAULT,
+                                    spgemmDesc, &bufferSize1, 0), "workestimation0 failed");
+        HANDLE_ERROR(cudaMalloc((void**) &dBuffer1, bufferSize1));
+        // inspect the matrices A and B to understand the memory requirement for
+        // the next step
+        checkCuSparseError(cusparseSpGEMM_workEstimation(handle, opA, opB,
+                                    &alpha, matA, matB, &beta, matC,
+                                    computeType, CUSPARSE_SPGEMM_DEFAULT,
+                                    spgemmDesc, &bufferSize1, dBuffer1), "workestimation1 failed");
 
-		cusparse_nnz = nnzC;
+        // ask bufferSize2 bytes for external memory
+        checkCuSparseError(cusparseSpGEMM_compute(handle, opA, opB,
+                            &alpha, matA, matB, &beta, matC,
+                            computeType, CUSPARSE_SPGEMM_DEFAULT,
+                            spgemmDesc, &bufferSize2, NULL), "compute0 failed");
+        HANDLE_ERROR(cudaMalloc((void**) &dBuffer2, bufferSize2));
 
-		// Allocate rest of memory
-		if(nnzC != matOut.nnz)
-		{
-			if (matOut.col_ids != nullptr)
-				cudaFree(matOut.col_ids);
-			if (matOut.data != nullptr)
-				cudaFree(matOut.data);
+        // compute the intermediate product of A * B
+        checkCuSparseError(cusparseSpGEMM_compute(handle, opA, opB,
+                            &alpha, matA, matB, &beta, matC,
+                            computeType, CUSPARSE_SPGEMM_DEFAULT,
+                            spgemmDesc, &bufferSize2, dBuffer2), "compute1 failed");
+        // get matrix C non-zero entries C_num_nnz1
+        int64_t C_num_rows1, C_num_cols1, C_num_nnz1;
+         checkCuSparseError(cusparseSpMatGetSize(matC, &C_num_rows1, &C_num_cols1, &C_num_nnz1), "get size failed");
+        // allocate matrix C
+        HANDLE_ERROR(cudaMalloc((void**) &dC_csrOffsets, (C_num_rows1 + 1) * sizeof(int)));
+        HANDLE_ERROR(cudaMalloc((void**) &dC_columns, C_num_nnz1 * sizeof(int)));
+        HANDLE_ERROR(cudaMalloc((void**) &dC_values,  C_num_nnz1 * sizeof(DataType)));
+        // update matC with the new pointers
+        checkCuSparseError(cusparseCsrSetPointers(matC, dC_csrOffsets, dC_columns, dC_values), "get pointers failed");
 
-			cudaMalloc(&(matOut.col_ids), sizeof(uint32_t) * nnzC);
-			cudaMalloc(&(matOut.data), sizeof(DataType) * nnzC);
-		}
-		
-		// Compute SpGEMM
-		checkCuSparseError(cusparseMultiply(
-			handle,
-			CUSPARSE_OPERATION_NON_TRANSPOSE,
-			CUSPARSE_OPERATION_NON_TRANSPOSE,
-			m, n, k,
-			descr, A.nnz, reinterpret_cast<const DataType*>(A.data), reinterpret_cast<const int*>(A.row_offsets), reinterpret_cast<const int*>(A.col_ids),
-			descrB, B.nnz, reinterpret_cast<const DataType*>(B.data), reinterpret_cast<const int*>(B.row_offsets), reinterpret_cast<const int*>(B.col_ids),
-			descrC, reinterpret_cast<DataType*>(matOut.data), reinterpret_cast<int*>(matOut.row_offsets), reinterpret_cast<int*>(matOut.col_ids)),
-			"cuSparse: SpGEMM failed");
+        // copy the final products to the matrix C
+        checkCuSparseError(cusparseSpGEMM_copy(
+            handle, 
+            opA, 
+            opB,
+            &alpha, 
+            matA, 
+            matB, 
+            &beta, 
+            matC,
+            computeType, 
+            CUSPARSE_SPGEMM_DEFAULT, 
+            spgemmDesc), 
+            "copy failed");
 
-		matOut.nnz = nnzC;
-		matOut.rows = m;
-		matOut.cols = n;
+        cusparseIndexType_t _rowType, _columnType;
+        cusparseIndexBase_t _indexBase;
+        cudaDataType _baseOff;
+        checkCuSparseError(cusparseCsrGet(matC,
+            (int64_t*) &matOut.rows,
+            (int64_t*) &matOut.cols,
+            (int64_t*) &matOut.nnz,
+            (void**) &matOut.row_offsets,
+            (void**) &matOut.col_ids,
+            (void**) &matOut.data,
+            &_rowType,
+            &_columnType,
+            &_indexBase,
+            &_baseOff
+        ), "get failed");
+        // destroy matrix/vector descriptors
+        checkCuSparseError( cusparseSpGEMM_destroyDescr(spgemmDesc), "destroy failed" );
+        HANDLE_ERROR(cudaFree(dBuffer1));
+        HANDLE_ERROR(cudaFree(dBuffer2));
 
 		// ############################
-		cudaDeviceSynchronize();
-		cudaEventRecord(stop);
-		cudaEventSynchronize(stop);
+		HANDLE_ERROR(cudaDeviceSynchronize());
+		HANDLE_ERROR(cudaEventRecord(stop));
+		HANDLE_ERROR(cudaEventSynchronize(stop));
 		// ############################
 
-		cudaEventElapsedTime(&duration, start, stop);
+		HANDLE_ERROR(cudaEventElapsedTime(&duration, start, stop));
+        cusparse_nnz = matOut.nnz;
 
 		return duration;
 	}

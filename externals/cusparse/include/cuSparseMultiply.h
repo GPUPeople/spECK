@@ -44,12 +44,13 @@ namespace cuSPARSE {
 
 		void Transpose(const dCSR<DataType>& A, dCSR<DataType>& AT);
 
-		void checkCuSparseError(cusparseStatus_t status, std::string errorMsg)
+		cusparseStatus_t checkCuSparseError(cusparseStatus_t status, std::string errorMsg)
 		{
 			if (status != CUSPARSE_STATUS_SUCCESS) {
 				std::cout << "CuSparse error: " << errorMsg << std::endl;
 				throw std::exception();
 			}
+			return status;
 		}
 
 		cusparseStatus_t CUSPARSEAPI cusparseMultiply(cusparseHandle_t handle,

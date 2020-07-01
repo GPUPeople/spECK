@@ -9,16 +9,16 @@ endif(NOT CMAKE_BUILD_TYPE)
 # Choose for which CC to build and if to enable Debug
 option(CUDA_BUILD_CC50 "Build with compute capability 5.0 support" FALSE)
 option(CUDA_BUILD_CC52 "Build with compute capability 5.2 support" FALSE)
-option(CUDA_BUILD_CC61 "Build with compute capability 6.1 support" FALSE)
+option(CUDA_BUILD_CC61 "Build with compute capability 6.1 support" TRUE)
 option(CUDA_BUILD_CC70 "Build with compute capability 7.0 support" FALSE)
 option(CUDA_BUILD_CC75 "Build with compute capability 7.5 support" FALSE)
-option(CUDA_BUILD_INFO "Build with kernel statistics and line numbers" TRUE)
+option(CUDA_BUILD_CC80 "Build with compute capability 8.0 support" FALSE)
+option(CUDA_BUILD_INFO "Build with kernel statistics and line numbers" FALSE)
 option(CUDA_BUILD_DEBUG "Build with kernel debug" FALSE)
 
 
 # Include Directories
 INCLUDE_DIRECTORIES(include)
-INCLUDE_DIRECTORIES(include/external)
 INCLUDE_DIRECTORIES(externals)
 INCLUDE_DIRECTORIES(${CMAKE_CUDA_TOOLKIT_INCLUDE_DIRECTORIES})
 
@@ -39,6 +39,9 @@ if (CUDA_BUILD_CC70)
 endif ()
 if (CUDA_BUILD_CC75)
 	string(APPEND CMAKE_CUDA_FLAGS " -gencode=arch=compute_61,code=sm_75")
+endif ()
+if (CUDA_BUILD_CC80)
+	string(APPEND CMAKE_CUDA_FLAGS " -gencode=arch=compute_61,code=sm_80")
 endif ()
 
 string(APPEND CMAKE_CUDA_FLAGS "  -Xcompiler -Wall -D_FORCE_INLINES -DVERBOSE --expt-extended-lambda -use_fast_math --expt-relaxed-constexpr")
