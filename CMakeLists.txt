@@ -9,7 +9,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 # Choose for which CC to build and if to enable Debug
 option(CUDA_BUILD_CC50 "Build with compute capability 5.0 support" FALSE)
 option(CUDA_BUILD_CC52 "Build with compute capability 5.2 support" FALSE)
-option(CUDA_BUILD_CC61 "Build with compute capability 6.1 support" TRUE)
+option(CUDA_BUILD_CC61 "Build with compute capability 6.1 support" FALSE)
 option(CUDA_BUILD_CC70 "Build with compute capability 7.0 support" FALSE)
 option(CUDA_BUILD_CC75 "Build with compute capability 7.5 support" FALSE)
 option(CUDA_BUILD_CC80 "Build with compute capability 8.0 support" FALSE)
