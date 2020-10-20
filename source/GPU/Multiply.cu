@@ -4,11 +4,6 @@
 #include <stdlib.h>
 #include <cuda_runtime.h>
 #include <math.h>
-#ifdef _WIN32
-#include <intrin.h>
-#else
-#include <x86intrin.h>
-#endif
 
 // Local includes
 #include "Multiply.h"
@@ -28,7 +23,6 @@
 #include "spECKConfig.h"
 
 using IndexType = uint32_t;
-using OffsetType = uint32_t;
 
 namespace spECK
 {

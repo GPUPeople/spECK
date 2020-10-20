@@ -64,7 +64,7 @@ endif()
 else()
 set(CUDA_PROPAGATE_HOST_FLAGS ON)
 SET(GCC_COVERAGE_LINK_FLAGS  "-lstdc++fs")
-string(APPEND CMAKE_CXX_FLAGS "-std=c++17 -mlzcnt -Wno-unknown-pragmas")
+string(APPEND CMAKE_CXX_FLAGS "-std=c++17 -Wno-unknown-pragmas")
 endif()
 
 SET(SPECKHEADERS
