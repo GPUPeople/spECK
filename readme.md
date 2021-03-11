@@ -12,6 +12,7 @@ This repository is based on *spECK: Accelerating GPU Sparse Matrix-Matrix Multip
         - 49152 for all devices before Volta and Turing
         - 65536 for Turing devices
         - 98304‬ for Volta devices
+        - 101376 for Ampere devices
     - if you do not know your GPU generation or hardware limits, compile and run spECK and it will throw errors with information about the correct values
 6. Build
     - Windows (use CMake GUI to setup project) or
