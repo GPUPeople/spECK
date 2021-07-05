@@ -560,7 +560,7 @@ __device__ __forceinline__ void directSpGEMMNumericImplementation(
 	for (INDEX_TYPE i = threadIdx.x; i < resultNnz; i += THREADS)
 	{
 		colIdsC[resultStartId + i] = colIdsB[idB + i];
-		valuesC[resultStartId + i] = valuesB[idB + 1] * valA;
+		valuesC[resultStartId + i] = valuesB[idB + i] * valA;
 	}
 
 	// this tells the sorting kernel that the row is already sorted
