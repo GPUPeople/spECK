@@ -13,7 +13,7 @@ option(CUDA_BUILD_CC61 "Build with compute capability 6.1 support" FALSE)
 option(CUDA_BUILD_CC70 "Build with compute capability 7.0 support" FALSE)
 option(CUDA_BUILD_CC75 "Build with compute capability 7.5 support" FALSE)
 option(CUDA_BUILD_CC80 "Build with compute capability 8.0 support" FALSE)
-option(CUDA_BUILD_CC80 "Build with compute capability 8.6 support" FALSE)
+option(CUDA_BUILD_CC86 "Build with compute capability 8.6 support" FALSE)
 option(CUDA_BUILD_INFO "Build with kernel statistics and line numbers" FALSE)
 option(CUDA_BUILD_DEBUG "Build with kernel debug" FALSE)
 
@@ -48,7 +48,7 @@ if (CUDA_BUILD_CC86)
 	string(APPEND CMAKE_CUDA_FLAGS " -gencode=arch=compute_61,code=sm_86")
 endif ()
 
-string(APPEND CMAKE_CUDA_FLAGS "  -Xcompiler -Wall -D_FORCE_INLINES -DVERBOSE --expt-extended-lambda -use_fast_math --expt-relaxed-constexpr")
+string(APPEND CMAKE_CUDA_FLAGS "  -Xcompiler -Wall -D_FORCE_INLINES --expt-extended-lambda -use_fast_math --expt-relaxed-constexpr")
 
 if (CUDA_BUILD_INFO)
 	string(APPEND CMAKE_CUDA_FLAGS " -keep --ptxas-options=-v -lineinfo")
@@ -68,7 +68,8 @@ endif()
 else()
 set(CUDA_PROPAGATE_HOST_FLAGS ON)
 SET(GCC_COVERAGE_LINK_FLAGS  "-lstdc++fs")
-string(APPEND CMAKE_CXX_FLAGS "-std=c++17 -Wno-unknown-pragmas")
+# string(APPEND CMAKE_CXX_FLAGS "-std=c++17 -Wno-unknown-pragmas")
+string(APPEND CMAKE_CXX_FLAGS "-Wno-unknown-pragmas")
 endif()
 
 SET(SPECKHEADERS
