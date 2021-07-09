@@ -41,7 +41,7 @@ __device__ void iterateMatrixCounting(INDEX_TYPE startId, INDEX_TYPE lastIdExcl,
 	const INDEX_TYPE* __restrict__ rowOffsetsA, const INDEX_TYPE* __restrict__ rowOffsetsB,
 	const INDEX_TYPE* __restrict__ colIdsA, const INDEX_TYPE* __restrict__ colIdsB,
 	const INDEX_TYPE nnzA, const INDEX_TYPE nnzB, const INDEX_TYPE rowsA, const INDEX_TYPE rowsB, 
-	bool supportGlobal,	GlobalMap** __restrict__ gMap, LocalMap& lMap,
+	bool supportGlobal,	GlobalMap** gMap, LocalMap& lMap,
 	GlobalMap* __restrict__  maps, INDEX_TYPE mapCount, INDEX_TYPE resultNnz, INDEX_TYPE minCol)
 {
 	// if not all threads can write value into map anymore, we have to switch to global map
@@ -293,7 +293,7 @@ private:
 		const INDEX_TYPE* __restrict__ rowOffsetsA, const INDEX_TYPE* __restrict__ rowOffsetsB,
 		const INDEX_TYPE* __restrict__ colIdsA, const INDEX_TYPE* __restrict__ colIdsB,
 		const INDEX_TYPE nnzA, const INDEX_TYPE nnzB, const INDEX_TYPE rowsA, const INDEX_TYPE rowsB,
-		GlobalMap** __restrict__ gMap, LocalMap& __restrict__ lMap,
+		GlobalMap** gMap, LocalMap& __restrict__ lMap,
 		GlobalMap* __restrict__  maps, INDEX_TYPE mapCount, INDEX_TYPE resultNnz, INDEX_TYPE minCol)
 	{
 		if (shift == 0)
@@ -325,7 +325,7 @@ public:
 		const INDEX_TYPE* __restrict__ rowOffsetsA, const INDEX_TYPE* __restrict__ rowOffsetsB,
 		const INDEX_TYPE* __restrict__ colIdsA, const INDEX_TYPE* __restrict__ colIdsB,
 		const INDEX_TYPE nnzA, const INDEX_TYPE nnzB, const INDEX_TYPE rowsA, const INDEX_TYPE rowsB, 
-		bool supportGlobal,	GlobalMap** __restrict__ gMap, LocalMap& __restrict__ lMap,
+		bool supportGlobal,	GlobalMap** gMap, LocalMap& __restrict__ lMap,
 		GlobalMap* __restrict__  maps, INDEX_TYPE mapCount, INDEX_TYPE resultNnz, INDEX_TYPE minCol)
 	{
 		if (direct == true)
@@ -867,7 +867,9 @@ __device__ __forceinline__ void hashSpGEMMNumericSingleRowImplementation(
 
 // gets information about the work for this block and then calls the actual implementation of hashSpGEMM
 template <typename INDEX_TYPE, typename VALUE_TYPE, class GlobalMap, uint32_t SHARED_HASH_SIZE, bool SUPPORT_GLOBAL, uint32_t THREADS>
-__global__ void __launch_bounds__(1024, 2) hashSpGEMMNumeric(
+__global__ void 
+// __launch_bounds__(1024, 2) 
+hashSpGEMMNumeric(
 	const INDEX_TYPE nnzA, const INDEX_TYPE nnzB, const INDEX_TYPE rowsA, const INDEX_TYPE rowsB, const INDEX_TYPE colsB,
 	const INDEX_TYPE *__restrict__ rowOffsetsA, const INDEX_TYPE *__restrict__ rowOffsetsB, const INDEX_TYPE *__restrict__ colIdsA, const INDEX_TYPE *__restrict__ colIdsB,
 	const VALUE_TYPE *__restrict__ valuesA, const VALUE_TYPE *__restrict__ valuesB,
@@ -1118,7 +1120,9 @@ __device__ __forceinline__ void hashSpGEMMCountSingleRowImplementation(
 
 // gets information about the work for this block and then calls the actual implementation of hashSpGEMM
 template <typename INDEX_TYPE, unsigned MAX_ROWS_PER_BLOCK, class GlobalMap, uint32_t SHARED_MEM_SIZE, bool SUPPORT_GLOBAL, uint32_t THREADS>
-__global__ void __launch_bounds__(1024, 2) hashSpGEMMCount(
+__global__ void 
+// __launch_bounds__(1024, 2) 
+hashSpGEMMCount(
 	const INDEX_TYPE nnzA, const INDEX_TYPE nnzB, const INDEX_TYPE rowsA, const INDEX_TYPE rowsB, const INDEX_TYPE colsB,
 	const INDEX_TYPE *__restrict__ rowOffsetsA, const INDEX_TYPE *__restrict__ rowOffsetsB, const INDEX_TYPE *__restrict__ colIdsA, const INDEX_TYPE *__restrict__ colIdsB,
 	GlobalMap *__restrict__ maps, INDEX_TYPE mapCount, INDEX_TYPE *__restrict__ matCNnzRow, const INDEX_TYPE *__restrict__ rowOperations,
@@ -1706,7 +1710,9 @@ __global__ void __launch_bounds__(1024, 1) denseSpGEMMCount(
 
 // gets information about the work for this block and then decides which method to use -> hash, dense or direct
 template <typename INDEX_TYPE, typename VALUE_TYPE, class GlobalHashMap, class GlobalRowOffsetMap, uint32_t SHARED_MEM_SIZE, bool SUPPORT_GLOBAL, uint32_t THREADS>
-__global__ void __launch_bounds__(1024, 2) spGEMMNumericLauncher(
+__global__ void 
+// __launch_bounds__(1024, 2) 
+spGEMMNumericLauncher(
 	const INDEX_TYPE nnzA, const INDEX_TYPE nnzB, const INDEX_TYPE nnzC, const INDEX_TYPE rowsA, const INDEX_TYPE rowsB, const INDEX_TYPE colsB,
 	const INDEX_TYPE *__restrict__ rowOffsetsA, const INDEX_TYPE *__restrict__ rowOffsetsB, const INDEX_TYPE *__restrict__ colIdsA, const INDEX_TYPE *__restrict__ colIdsB,
 	const VALUE_TYPE *__restrict__ valuesA, const VALUE_TYPE *__restrict__ valuesB,
@@ -1787,7 +1793,9 @@ __global__ void __launch_bounds__(1024, 2) spGEMMNumericLauncher(
 
 // gets information about the work for this block and then decides which method to use -> hash, dense or direct
 template <typename INDEX_TYPE, uint32_t MAX_ROWS_PER_BLOCK, class GlobalHashMap, class GlobalRowOffsetMap, uint32_t SHARED_MEM_SIZE, bool SUPPORT_GLOBAL, uint32_t THREADS>
-__global__ void __launch_bounds__(1024, 2) spGEMMCountLauncher(
+__global__ void 
+// __launch_bounds__(1024, 2) 
+spGEMMCountLauncher(
 	const INDEX_TYPE nnzA, const INDEX_TYPE nnzB, const INDEX_TYPE rowsA, const INDEX_TYPE rowsB, const INDEX_TYPE colsB,
 	const INDEX_TYPE *__restrict__ rowOffsetsA, const INDEX_TYPE *__restrict__ rowOffsetsB, const INDEX_TYPE *__restrict__ colIdsA, const INDEX_TYPE *__restrict__ colIdsB,
 	GlobalHashMap *hashMaps, INDEX_TYPE hashMapCount, GlobalRowOffsetMap *rowOffsetMaps, INDEX_TYPE rowOffsetMapCount,
