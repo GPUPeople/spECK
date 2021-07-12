@@ -9,13 +9,15 @@ This repository is based on *spECK: Accelerating GPU Sparse Matrix-Matrix Multip
 5. Set spECK_STATIC_MEM_PER_BLOCK and spECK_DYNAMIC_MEM_PER_BLOCK in include/Multiply.h line 9 & 10 to the values your hardware supports
     - spECK_STATIC_MEM_PER_BLOCK should be 49152 for all recent devices
     - spECK_DYNAMIC_MEM_PER_BLOCK should be 
-        - 49152 for all devices before Volta and Turing
-        - 65536 for Turing devices
-        - 98304‬ for Volta devices
+        - 49152 for all devices before Volta and Turing (cc < 7.0)
+        - 65536 for Turing devices (cc7.5)
+        - 98304‬ for Volta devices (cc7.0)
+        - 101376 for Ampere consumer devices (RTX 30xx) (cc8.6)
+        - 166912 for Ampere professional devices (e.g. A100) (cc8.0)
     - if you do not know your GPU generation or hardware limits, compile and run spECK and it will throw errors with information about the correct values
 6. Build
     - Windows (use CMake GUI to setup project) or
-        o Build the project using "cmake -DCUDA_BUILD_CC70=TRUE -S . -B build -A x64" (Set CCXX to correct Compute Capability) followed by opening "runSpeck.sln", select "Release" configuration and build
+        o Build the project using "cmake -DCUDA_BUILD_CC86=TRUE -S . -B build -A x64" (Set CCXX to correct Compute Capability) followed by opening "runSpeck.sln", select "Release" configuration and build
         o run spECK using ".\build\Release\runspECK.exe <path-to-csr-matrix> config.ini"
     - Linux
         o Set the correct ComputeCapability (Default is CC70) in "linuxsetup.sh" and run "./linuxsetup.sh"
