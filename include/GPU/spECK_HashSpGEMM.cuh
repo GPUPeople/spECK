@@ -1344,6 +1344,7 @@ __device__ __forceinline__ void denseSpGEMMNumericImplementation(
 			sMem.globalOffsetsMap = reserveMap<GlobalRowOffsetsMap>(maps, mapCount);
 			sMem.rowOffsets = sMem.globalOffsetsMap->ids;
 		}
+		__syncthreads();
 		temp_storage = (typename  BlockScan::TempStorage*) (void*)dynamicShared;
 		values = (VALUE_TYPE*) &((char*)dynamicShared)[sizeof(BlockScan::TempStorage)];
 		prefix = (INDEX_TYPE*) &values[elementsPerBlock];
@@ -1605,6 +1606,7 @@ __device__ __forceinline__ void denseSpGEMMCountImplementation(
 		{
 			globalOffsetsMap = reserveMap<GlobalOffsetMap>((GlobalOffsetMap *)maps, mapCount);
 		}
+		__syncthreads();
 		temp_storage = (typename  BlockReduce::TempStorage*) (void*)dynamicShared;
 		currentRowMinOffset = (INDEX_TYPE*) &temp_storage[1];
 		prefix = &currentRowMinOffset[32];
