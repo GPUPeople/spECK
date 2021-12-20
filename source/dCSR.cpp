@@ -96,21 +96,28 @@ void convert(CSR<T>& dst, const CSR<T>& src, unsigned int padding)
 
 template void dCSR<float>::alloc(size_t r, size_t c, size_t n, bool allocOffsets);
 template void dCSR<double>::alloc(size_t r, size_t c, size_t n, bool allocOffsets);
+template void dCSR<uint64_t>::alloc(size_t r, size_t c, size_t n, bool allocOffsets);
 
 template dCSR<float>::~dCSR();
 template dCSR<double>::~dCSR();
+template dCSR<uint64_t>::~dCSR();
 
 template void dCSR<float>::reset();
 template void dCSR<double>::reset();
+template void dCSR<uint64_t>::reset();
 
 template void convert(dCSR<float>& dcsr, const CSR<float>& csr, unsigned int);
 template void convert(dCSR<double>& dcsr, const CSR<double>& csr, unsigned int);
+template void convert(dCSR<uint64_t>& dcsr, const CSR<double>& csr, unsigned int);
 
 template void convert(CSR<float>& csr, const dCSR<float>& dcsr, unsigned int padding);
 template void convert(CSR<double>& csr, const dCSR<double>& dcsr, unsigned int padding);
+template void convert(CSR<uint64_t>& csr, const dCSR<double>& dcsr, unsigned int padding);
 
 template void convert(dCSR<float>& dcsr, const dCSR<float>& csr, unsigned int);
 template void convert(dCSR<double>& dcsr, const dCSR<double>& csr, unsigned int);
+template void convert(dCSR<uint64_t>& dcsr, const dCSR<double>& csr, unsigned int);
 
 template void convert(CSR<float>& csr, const CSR<float>& dcsr, unsigned int padding);
 template void convert(CSR<double>& csr, const CSR<double>& dcsr, unsigned int padding);
+template void convert(CSR<uint64_t>& csr, const CSR<double>& dcsr, unsigned int padding);

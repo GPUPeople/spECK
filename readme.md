@@ -11,7 +11,7 @@ This repository is based on *spECK: Accelerating GPU Sparse Matrix-Matrix Multip
     - spECK_DYNAMIC_MEM_PER_BLOCK should be 
         - 49152 for all devices before Volta and Turing (cc < 7.0)
         - 65536 for Turing devices (cc7.5)
-        - 98304‬ for Volta devices (cc7.0)
+        - 98304 for Volta devices (cc7.0)
         - 101376 for Ampere consumer devices (RTX 30xx) (cc8.6)
         - 166912 for Ampere professional devices (e.g. A100) (cc8.0)
     - if you do not know your GPU generation or hardware limits, compile and run spECK and it will throw errors with information about the correct values

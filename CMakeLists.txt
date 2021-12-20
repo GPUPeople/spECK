@@ -13,7 +13,7 @@ option(CUDA_BUILD_CC61 "Build with compute capability 6.1 support" FALSE)
 option(CUDA_BUILD_CC70 "Build with compute capability 7.0 support" FALSE)
 option(CUDA_BUILD_CC75 "Build with compute capability 7.5 support" FALSE)
 option(CUDA_BUILD_CC80 "Build with compute capability 8.0 support" FALSE)
-option(CUDA_BUILD_CC86 "Build with compute capability 8.6 support" FALSE)
+option(CUDA_BUILD_CC86 "Build with compute capability 8.6 support" TRUE)
 option(CUDA_BUILD_INFO "Build with kernel statistics and line numbers" FALSE)
 option(CUDA_BUILD_DEBUG "Build with kernel debug" FALSE)
 
@@ -118,6 +118,7 @@ add_library(spECKLib
 				source/GPU/Multiply.cu
 				${SPECKHEADERS}
 )
+set_property(TARGET spECKLib PROPERTY CUDA_STANDARD 17)
 
 # For transposing matrices
 SET(COMP_SOURCES "externals/cusparse/source/cuSparseMultiply.cu")
@@ -134,6 +135,7 @@ add_executable(runspECK
 				include/RunConfig.h
 				include/spECKConfig.h
 )
+set_property(TARGET runspECK PROPERTY CUDA_STANDARD 17)
 
 # Link Libraries
 TARGET_LINK_LIBRARIES(runspECK spECKLib cusparse ${GCC_COVERAGE_LINK_FLAGS})
