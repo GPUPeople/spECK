@@ -868,7 +868,7 @@ __device__ __forceinline__ void hashSpGEMMNumericSingleRowImplementation(
 // gets information about the work for this block and then calls the actual implementation of hashSpGEMM
 template <typename INDEX_TYPE, typename VALUE_TYPE, class GlobalMap, uint32_t SHARED_HASH_SIZE, bool SUPPORT_GLOBAL, uint32_t THREADS>
 __global__ void 
-// __launch_bounds__(1024, 2) 
+__launch_bounds__(1024, 2) 
 hashSpGEMMNumeric(
 	const INDEX_TYPE nnzA, const INDEX_TYPE nnzB, const INDEX_TYPE rowsA, const INDEX_TYPE rowsB, const INDEX_TYPE colsB,
 	const INDEX_TYPE *__restrict__ rowOffsetsA, const INDEX_TYPE *__restrict__ rowOffsetsB, const INDEX_TYPE *__restrict__ colIdsA, const INDEX_TYPE *__restrict__ colIdsB,
@@ -1121,7 +1121,7 @@ __device__ __forceinline__ void hashSpGEMMCountSingleRowImplementation(
 // gets information about the work for this block and then calls the actual implementation of hashSpGEMM
 template <typename INDEX_TYPE, unsigned MAX_ROWS_PER_BLOCK, class GlobalMap, uint32_t SHARED_MEM_SIZE, bool SUPPORT_GLOBAL, uint32_t THREADS>
 __global__ void 
-// __launch_bounds__(1024, 2) 
+__launch_bounds__(1024, 2) 
 hashSpGEMMCount(
 	const INDEX_TYPE nnzA, const INDEX_TYPE nnzB, const INDEX_TYPE rowsA, const INDEX_TYPE rowsB, const INDEX_TYPE colsB,
 	const INDEX_TYPE *__restrict__ rowOffsetsA, const INDEX_TYPE *__restrict__ rowOffsetsB, const INDEX_TYPE *__restrict__ colIdsA, const INDEX_TYPE *__restrict__ colIdsB,
@@ -1713,7 +1713,7 @@ __global__ void __launch_bounds__(1024, 1) denseSpGEMMCount(
 // gets information about the work for this block and then decides which method to use -> hash, dense or direct
 template <typename INDEX_TYPE, typename VALUE_TYPE, class GlobalHashMap, class GlobalRowOffsetMap, uint32_t SHARED_MEM_SIZE, bool SUPPORT_GLOBAL, uint32_t THREADS>
 __global__ void 
-// __launch_bounds__(1024, 2) 
+__launch_bounds__(1024, 2) 
 spGEMMNumericLauncher(
 	const INDEX_TYPE nnzA, const INDEX_TYPE nnzB, const INDEX_TYPE nnzC, const INDEX_TYPE rowsA, const INDEX_TYPE rowsB, const INDEX_TYPE colsB,
 	const INDEX_TYPE *__restrict__ rowOffsetsA, const INDEX_TYPE *__restrict__ rowOffsetsB, const INDEX_TYPE *__restrict__ colIdsA, const INDEX_TYPE *__restrict__ colIdsB,
@@ -1796,7 +1796,7 @@ spGEMMNumericLauncher(
 // gets information about the work for this block and then decides which method to use -> hash, dense or direct
 template <typename INDEX_TYPE, uint32_t MAX_ROWS_PER_BLOCK, class GlobalHashMap, class GlobalRowOffsetMap, uint32_t SHARED_MEM_SIZE, bool SUPPORT_GLOBAL, uint32_t THREADS>
 __global__ void 
-// __launch_bounds__(1024, 2) 
+__launch_bounds__(1024, 2) 
 spGEMMCountLauncher(
 	const INDEX_TYPE nnzA, const INDEX_TYPE nnzB, const INDEX_TYPE rowsA, const INDEX_TYPE rowsB, const INDEX_TYPE colsB,
 	const INDEX_TYPE *__restrict__ rowOffsetsA, const INDEX_TYPE *__restrict__ rowOffsetsB, const INDEX_TYPE *__restrict__ colIdsA, const INDEX_TYPE *__restrict__ colIdsB,
@@ -2022,7 +2022,7 @@ void spECKKernels::h_SpGEMMNumericLauncher(dCSRNoDealloc<VALUE_TYPE> matA, dCSRN
 	INDEX_TYPE *blockStartRow, INDEX_TYPE *rowOperations, Config::SortModes sortColumns, uint32_t numberBlocks, const INDEX_TYPE* rowColMinMax,
 	INDEX_TYPE *rowMaxOperations, uint32_t minimumDensity, bool setSortedBit, uint32_t rowsPerBlock)
 {
-	cudaFuncSetAttribute(spGEMMNumericLauncher<INDEX_TYPE, VALUE_TYPE, GlobalHashMap, GlobalRowOffsetMap, SHARED_HASH_SIZE, SUPPORT_GLOBAL, THREADS/2>, 
+	cudaFuncSetAttribute(spGEMMNumericLauncher<INDEX_TYPE, VALUE_TYPE, GlobalHashMap, GlobalRowOffsetMap, SHARED_HASH_SIZE, SUPPORT_GLOBAL, THREADS>, 
 		cudaFuncAttributeMaxDynamicSharedMemorySize, sharedMem);
 	spGEMMNumericLauncher<INDEX_TYPE, VALUE_TYPE, GlobalHashMap, GlobalRowOffsetMap, SHARED_HASH_SIZE, SUPPORT_GLOBAL, THREADS><<<gridDim, blockDim, sharedMem, stream>>>(
 		matA.nnz, matB.nnz, matC.nnz, matA.rows, matB.rows, matB.cols, matA.row_offsets, matB.row_offsets, matA.col_ids, matB.col_ids, matA.data, matB.data,
