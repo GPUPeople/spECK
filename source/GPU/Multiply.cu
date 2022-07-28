@@ -71,27 +71,27 @@ void MultiplyspECKImplementation(const dCSR<DataType> &matA_Dealloc, const dCSR<
 
     if (MAX_DYNAMIC_SHARED != config.maxDynamicSharedMemoryPerBlock || MAX_STATIC_SHARED != config.maxStaticSharedMemoryPerBlock) {
         if (MAX_DYNAMIC_SHARED > config.maxDynamicSharedMemoryPerBlock) {
-            printf("ERROR: spECK was compiled with %d maximum dynamic shared memory, but device limit is %d. Please recompile with correct amount set in MultiplyVar.h line 10: spECK_DYNAMIC_MEM_PER_BLOCK\n",
+            printf("ERROR: spECK was compiled with %d maximum dynamic shared memory, but device limit is %d. Please recompile with correct amount set in Multiply.h line 10: spECK_DYNAMIC_MEM_PER_BLOCK\n",
                 MAX_DYNAMIC_SHARED, config.maxDynamicSharedMemoryPerBlock);
             return;
         } else {
-            printf("WARNING: spECK was compiled with %d maximum dynamic shared memory, but device limit is %d. Please recompile with correct amount set in MultiplyVar.h line 10: spECK_DYNAMIC_MEM_PER_BLOCK\n",
+            printf("WARNING: spECK was compiled with %d maximum dynamic shared memory, but device limit is %d. Please recompile with correct amount set in Multiply.h line 10: spECK_DYNAMIC_MEM_PER_BLOCK\n",
                 MAX_DYNAMIC_SHARED, config.maxDynamicSharedMemoryPerBlock);
         }
 		if (MAX_STATIC_SHARED > MAX_DYNAMIC_SHARED)
 		{
-			printf("ERROR: spECK was compiled with smaller dynamic than static shared memory. (%d maximum static shared memory and %d maximum dynamic shared memory). Please check values in MultiplyVar.h line 9 and 10",
+			printf("ERROR: spECK was compiled with smaller dynamic than static shared memory. (%d maximum static shared memory and %d maximum dynamic shared memory). Please check values in Multiply.h line 9 and 10",
 				MAX_STATIC_SHARED, MAX_DYNAMIC_SHARED);
 			return;
 		}
 		if (MAX_STATIC_SHARED > config.maxStaticSharedMemoryPerBlock)
 		{
-			printf("ERROR: spECK was compiled with %d maximum static shared memory, but device limit is %d. Please recompile with correct amount set in MultiplyVar.h line 9: spECK_STATIC_MEM_PER_BLOCK\n",
+			printf("ERROR: spECK was compiled with %d maximum static shared memory, but device limit is %d. Please recompile with correct amount set in Multiply.h line 9: spECK_STATIC_MEM_PER_BLOCK\n",
 				MAX_STATIC_SHARED, config.maxStaticSharedMemoryPerBlock);
 			return;
 		}
 		else if (MAX_STATIC_SHARED < config.maxStaticSharedMemoryPerBlock) {
-			printf("WARNING: spECK was compiled with %d maximum static shared memory, but device limit is %d. Please recompile with correct amount set in MultiplyVar.h line 9: spECK_STATIC_MEM_PER_BLOCK\n",
+			printf("WARNING: spECK was compiled with %d maximum static shared memory, but device limit is %d. Please recompile with correct amount set in Multiply.h line 9: spECK_STATIC_MEM_PER_BLOCK\n",
 				MAX_STATIC_SHARED, config.maxStaticSharedMemoryPerBlock);
 		}
     }

@@ -429,7 +429,7 @@ __global__ void readOperations(dCSRNoDealloc<VALUE_TYPE> matA, dCSRNoDealloc<VAL
 			maxRowLength = max(maxRowLength, __shfl_down_sync(0xFFFFFFFF, maxRowLength, i));
 
 		if (threadIdx.x % 32 == 0 && maxRowLength > 0)
-			atomicAdd(&blockMaxOps, maxRowLength);
+			atomicMax(&blockMaxOps, maxRowLength);
 
 		__syncthreads();
 	}
