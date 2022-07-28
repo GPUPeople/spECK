@@ -3,7 +3,7 @@
 #pragma once
 
 #define NUM_BANKS 32U
-#define LOG_NUM_BANKS 6U
+#define LOG_NUM_BANKS 5U
 // MP4.2 - You can use any other block size you wish.
 #define BLOCK_SIZE 512U
 
@@ -28,8 +28,9 @@ struct ParallelScanHostData
 // MP4.2 - Host Helper Functions (allocate your own data structure...)
 
 
-#define CONFLICT_FREE_OFFSET(n) \
-	((n) >> NUM_BANKS + (n) >> (2 * LOG_NUM_BANKS))
+// #define CONFLICT_FREE_OFFSET(n) \
+// 	((n) >> NUM_BANKS + (n) >> (2 * LOG_NUM_BANKS))
+#define CONFLICT_FREE_OFFSET(n) (0)
 
 template <typename T, class CombineOp, class InputIterator, class OutputIterator>
 __global__ void prescanArrayKernel(OutputIterator out, InputIterator in, int numElements, CombineOp combine)
