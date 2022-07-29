@@ -242,7 +242,7 @@ void MultiplyspECKImplementation(const dCSR<DataType> &matA_Dealloc, const dCSR<
         // -> and always try to stay slightly below the threads per block size, because if you are slightly above, it is way more expensive than being far below
         uint32_t rowsPerBlock = std::min(threadsPerBlock, std::max(1U, (threadsPerBlock - 8) / std::max(1U, uint32_t(matA.nnz / matA.rows))));
         rowsPerBlock = std::max(1U, std::min(rowsPerBlock, uint32_t(matA.rows) / (4U * cudaCores / threadsPerBlock)));
-        readOperations<IndexType, DataType, IndexType, threadsPerBlock, entriesPerWarpCounting * warpsCounting><<<divup(uint32_t(matA.rows), rowsPerBlock), threadsPerBlock>>>(
+        readOperations<IndexType, DataType, IndexType, threadsPerBlock><<<divup(uint32_t(matA.rows), rowsPerBlock), threadsPerBlock>>>(
             matA, matB, d_rowOperations, rowsPerBlock, d_maxComputationsPerRow, d_rowColMinMax, d_rowMaxOperations, d_sumProducts);
 
         // copying both values at once gives a huge performance boost
