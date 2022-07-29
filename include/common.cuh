@@ -299,7 +299,7 @@ __device__ __host__ __forceinline__ uint32_t blockRangeToNumRows(uint32_t blockR
 	return (blockRange & 0b11111) + 1;
 }
 
-template<uint32_t SHARED_HASH_ENTRIES>
+
 __device__ __forceinline__ uint32_t toRowColMinMax(uint32_t minCol, uint32_t maxCol)
 {
 	uint32_t width = 32U - __clz(maxCol - minCol);
@@ -318,14 +318,15 @@ __device__ __forceinline__ uint32_t rowColMinMaxtoRowLength(uint32_t rowColMinMa
 	return 1 << (rowColMinMax >> 27);
 }
 
-template<typename INDEX_TYPE, typename VALUE_TYPE, class T, uint32_t THREADS, uint32_t SHARED_HASH_ENTRIES>
+template<typename INDEX_TYPE, typename VALUE_TYPE, class T, uint32_t THREADS>
 __global__ void readOperations(dCSRNoDealloc<VALUE_TYPE> matA, dCSRNoDealloc<VALUE_TYPE> matB, T *out, int rowsPerBlock, 
 	INDEX_TYPE *maxComputationsPerRow, INDEX_TYPE *rowColMinMax, INDEX_TYPE *rowOperationsMax, INDEX_TYPE *sumProducts)
 {
 	INDEX_TYPE startRow = blockIdx.x * rowsPerBlock;
-	INDEX_TYPE lastRowExcl = (blockIdx.x + 1) * rowsPerBlock;
+	INDEX_TYPE lastRowExcl = min(INDEX_TYPE((blockIdx.x + 1) * rowsPerBlock), INDEX_TYPE(matA.rows));
 	bool checkCols = rowColMinMax != nullptr;
 	bool checkRowOpsMax = rowOperationsMax != nullptr;
+		
 
 	if (startRow >= matA.rows)
 		return;
@@ -342,7 +343,7 @@ __global__ void readOperations(dCSRNoDealloc<VALUE_TYPE> matA, dCSRNoDealloc<VAL
 	rowMaxOps[threadIdx.x] = 0U;
 	rowMinCols[threadIdx.x] = spECK::numeric_limits<INDEX_TYPE>::max();
 	rowMaxCols[threadIdx.x] = 0U;
-	rowOffsets[threadIdx.x] = (startRow + threadIdx.x < matA.rows) ? matA.row_offsets[startRow + threadIdx.x] : matA.nnz;
+	rowOffsets[threadIdx.x] = (startRow + threadIdx.x <= lastRowExcl) ? matA.row_offsets[startRow + threadIdx.x] : matA.nnz;
 	if (threadIdx.x == 0) {
 		blockProducts = 0;
 		blockMaxOps = 0;
@@ -388,10 +389,10 @@ __global__ void readOperations(dCSRNoDealloc<VALUE_TYPE> matA, dCSRNoDealloc<VAL
 
 		INDEX_TYPE rowB = matA.col_ids[id];
 		INDEX_TYPE startIdB = matB.row_offsets[rowB];
-		INDEX_TYPE lastIdBExcl = (rowB + 1 < matB.rows ? matB.row_offsets[rowB + 1] : matB.nnz);
+		INDEX_TYPE lastIdBExcl = rowB + 1 <= matB.rows ? matB.row_offsets[rowB + 1] : matB.nnz;
 		INDEX_TYPE operations = lastIdBExcl - startIdB;
 
-		if(checkCols)
+		if(checkCols && startIdB < lastIdBExcl)
 		{
 			currentMin = min(currentMin, matB.col_ids[startIdB]);
 			if (lastIdBExcl > 0)
@@ -439,7 +440,7 @@ __global__ void readOperations(dCSRNoDealloc<VALUE_TYPE> matA, dCSRNoDealloc<VAL
 	{
 		out[startRow + threadIdx.x] = rowOpsCounter[threadIdx.x];
 		if(checkCols)
-			rowColMinMax[startRow + threadIdx.x] = toRowColMinMax<SHARED_HASH_ENTRIES>(rowMinCols[threadIdx.x], rowMaxCols[threadIdx.x]);
+			rowColMinMax[startRow + threadIdx.x] = toRowColMinMax(rowMinCols[threadIdx.x], rowMaxCols[threadIdx.x]);
 		if(checkRowOpsMax)
 			rowOperationsMax[startRow + threadIdx.x] = rowMaxOps[threadIdx.x];
 	}
