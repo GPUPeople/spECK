@@ -50,7 +50,7 @@ int Executor<ValueType>::run()
 
 		if (dCsrHiRes.data != nullptr && dCsrHiRes.col_ids != nullptr && Config::getBool(Config::CompareResult))
 		{
-			if (!spECK::Compare(dCsrReference, dCsrHiRes, false))
+			if (!spECK::Compare(dCsrReference, dCsrHiRes, compareData))
 				printf("Error: Matrix incorrect\n");
 		}
 	}
@@ -66,7 +66,7 @@ int Executor<ValueType>::run()
 
 		if (dCsrHiRes.data != nullptr && dCsrHiRes.col_ids != nullptr && Config::getBool(Config::CompareResult))
 		{
-			if (!spECK::Compare(dCsrReference, dCsrHiRes, false))
+			if (!spECK::Compare(dCsrReference, dCsrHiRes, compareData))
 				printf("Error: Matrix incorrect\n");
 		}
 	}
@@ -80,5 +80,5 @@ int Executor<ValueType>::run()
 	return 0;
 }
 
- // template int Executor<float>::run();
+template int Executor<float>::run();
 template int Executor<double>::run();
